@@ -1,0 +1,24 @@
+--2021-04-16 15:54:36--  ftp://ftp.sra.ebi.ac.uk/vol1/ERZ267/ERZ267013/*.tsv
+           => ‘../data//tpm/.listing’
+Resolving ftp.sra.ebi.ac.uk (ftp.sra.ebi.ac.uk)... 193.62.197.74
+Connecting to ftp.sra.ebi.ac.uk (ftp.sra.ebi.ac.uk)|193.62.197.74|:21... connected.
+Logging in as anonymous ... Logged in!
+==> SYST ... done.    ==> PWD ... done.
+==> TYPE I ... done.  ==> CWD (1) /vol1/ERZ267/ERZ267013 ... done.
+==> PASV ... done.    ==> LIST ... done.
+
+
+
+2021-04-16 15:54:38 (14.1 KB/s) - ‘../data//tpm/.listing’ saved [330]
+
+Removed ‘../data//tpm/.listing’.
+--2021-04-16 15:54:38--  ftp://ftp.sra.ebi.ac.uk/vol1/ERZ267/ERZ267013/HPSI0114i-joxm_1.GRCh37.75.cdna.kallisto.transcripts.abundance.rnaseq.20150415.tsv
+           => ‘../data//tpm/HPSI0114i-joxm_1.GRCh37.75.cdna.kallisto.transcripts.abundance.rnaseq.20150415.tsv’
+==> CWD not required.
+==> PASV ... done.    ==> RETR HPSI0114i-joxm_1.GRCh37.75.cdna.kallisto.transcripts.abundance.rnaseq.20150415.tsv ... done.
+Length: 7072697 (6.7M)
+
+         HPSI0114i-   0%[                    ]  20.58K  61.6KB/s                       HPSI0114i-j   1%[                    ]  93.08K   149KB/s                      HPSI0114i-jo   5%[>                   ] 382.38K   418KB/s                     HPSI0114i-jox  22%[===>                ]   1.49M  1.23MB/s                    HPSI0114i-joxm  65%[============>       ]   4.42M  3.13MB/s               HPSI0114i-joxm_1.GR 100%[===================>]   6.74M  4.37MB/s    in 1.5s    
+
+2021-04-16 15:54:40 (4.37 MB/s) - ‘../data//tpm/HPSI0114i-joxm_1.GRCh37.75.cdna.kallisto.transcripts.abundance.rnaseq.20150415.tsv’ saved [7072697]
+
