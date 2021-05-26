@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
+from joblib import dump, load
 
 
 class Model(ABC):
     '''
     Model is an abstract class to define common methods across all models.
-    All regression models we use should inherit from RegressionModel.
+    All regression models we use should inherit from Model.
     A score can be retrieved by calling model.propagate()
 
     init args: data_path as a string. This is the ONLY input.
@@ -26,6 +27,10 @@ class Model(ABC):
 
     @abstractmethod
     def rank_importance(self):
+        pass
+
+    @abstractmethod
+    def save_model(self, filenames):
         pass
 
 
@@ -53,6 +58,10 @@ class LogisticModel(Model):
         y_pred = model.predict(X_test)
         return y_pred
 
+    def prediction_probs(self, model, X_test):
+        y_probs = model.predict_proba(X_test)
+        return y_probs
+
     def rank_importance(self):
         pass
 
@@ -61,12 +70,15 @@ class LogisticModel(Model):
         acc = (sum(true_list == 1)) / len(true_list == 1)
         return acc
 
+    def save_model(self, filename):
+        dump(self.clf, self.data_dir + '/' + filename + '.joblib')
+
     def execute_all(self):
         self.clf = self.train(self.X_train, self.y_train)
-        y_pred = self.predict(self.X_test)
+        y_pred = self.predict(self.clf, self.X_test)
         accuracy = self.calc_accuracy(self.y_test, y_pred)
-        print("Model accuracy is: " + accuracy)
-
+        print("Model accuracy is: " + str(accuracy))
+        self.save_model('logistic_v1')
 
 
 
