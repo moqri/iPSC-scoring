@@ -1,0 +1,174 @@
+---
+title: "Data Exploration"
+output: pdf_document
+---
+# Data Exploration  
+Comparing gene expression : iPSCs vs. fibroblasts  
+and iPSCs vs. ESCs  
+
+**Goal:** Identify most differentially expressed transcripts between iPSCs and other cell lines. 
+
+#### Ellen Bouchard  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyr)
+```
+
+## Data  
+iPSC data: origin HipSci  
+TPM values of35050 transcripts for 300 iPSC lines.  
+
+Fibroblast data: origin GTEX  
+TPM values of 56201 transcripts for 100 fibroblast lines.  
+
+ESC data: origin GTEX  
+TPM values of 49879 transcripts for 30 human embryonic stem cell lines.  
+
+```{r}
+ips_data <- read.csv("ips_tpm")
+fib_data <- read.csv("fib_tpm.csv")
+es_data <- read.csv("es_tpm.csv")
+```
+
+##Analysis: iPSCs vs. Fibroblasts  
+Datasets are joined such that only transcripts included in both datasets are retained.   
+Mean TPM values are calculated for IPSCs and Fibroblast cell lines. 
+
+```{r}
+#Calculate mean TPM : Fibroblast vs IPS
+
+#Add category label, combine datasets while only including genes that are present in both
+ips_data$Category <- "IPS"
+fib_data$Category <- "FIB"
+fib_ips_bound <- bind_rows(fib_data,ips_data)
+
+#Calculate mean TPM values for each gene for two categories
+fib_ips_mean <- fib_ips_bound %>% group_by(Category) %>% summarise_each(funs(mean))
+fib_means <- filter(fib_ips_mean, Category == "FIB")
+ips_means <- filter(fib_ips_mean, Category == "IPS")
+
+#Pivot to long format, combine into one dataset
+fib_means_long <- pivot_longer(fib_means, !Category, names_to = "Gene", values_to = "FIB_MeanTPM")
+fib_means_long <- select(fib_means_long, -Category)
+ips_means_long <- pivot_longer(ips_means, !Category, names_to = "Gene", values_to = "IPS_MeanTPM")
+ips_means_long <- select(ips_means_long, -Category)
+
+fib_ips_mean_long <- full_join(fib_means_long, ips_means_long)
+
+write.csv(fib_ips_mean_long, "FIB_IPS_Means.csv")
+```
+
+Mean TPM values are adjusted by adding 1 to each value, in order to overcome issue of TPM values of zero leading to Log2FoldChange values of Inf.   
+Mean TPM values are converted to Log2 values.  
+Log2FoldChange values are calculated for each transcript.  
+Resulting dataframe is ordered by descending Log2FoldChange. Top genes are those that are most upregulated in iPSCs as compared to fibroblasts. 
+
+
+```{r}
+#ADD ONE TO ADJUST TPM VALUES
+#Calculate Log2FoldChange values: Fib vs IPS
+
+#Add 1 to all values
+fib_ips_mean_adj <- select(fib_ips_mean_long, -Gene) + 1
+fib_ips_mean_adj$Gene <- fib_ips_mean_long$Gene
+
+#Calculate Log2 values 
+fib_ips_mean_adj$FIB_Log2 <- log2(fib_ips_mean_adj$FIB_MeanTPM)
+fib_ips_mean_adj$IPS_Log2 <- log2(fib_ips_mean_adj$IPS_MeanTPM)
+
+#Calculate Log2 Fold Change values
+fib_ips_mean_adj$Log2FoldChange <- fib_ips_mean_adj$IPS_Log2 - fib_ips_mean_adj$FIB_Log2
+
+#Take absolute value of Log2FoldChange, arrange by this value
+fib_ips_mean_adj$ABSV_Log2 <- abs(fib_ips_mean_adj$Log2FoldChange)
+
+fib_ips_mean_adj <- arrange(fib_ips_mean_adj, desc(Log2FoldChange))
+fib_ips_mean_adj <- fib_ips_mean_adj[, c(3, 1, 2, 4, 5, 6, 7)]
+
+write.csv(fib_ips_mean_adj, "FIB_IPS_Mean_TPM_Adjusted_v2.csv")
+```
+
+
+##Analysis: iPSCs vs. ESCs  
+As above. Datasets are joined such that only transcripts included in both datasets are retained.   
+Mean TPM values are calculated for IPSCs and ES cell lines. 
+```{r}
+#Calculate mean TPM : Fibroblast vs ES
+
+#Add category label, combine datasets while only including genes that are present in both
+ips_data$Category <- "IPS"
+es_data$Category <- "ES"
+es_ips_bound <- bind_rows(es_data,ips_data)
+
+#Calculate mean TPM values for each gene for two categories
+es_ips_mean <- es_ips_bound %>% group_by(Category) %>% summarise_each(funs(mean))
+es_means <- filter(es_ips_mean, Category == "ES")
+ips_means <- filter(es_ips_mean, Category == "IPS")
+
+#Pivot to long format, combine into one dataset
+es_means_long <- pivot_longer(es_means, !Category, names_to = "Gene", values_to = "ES_MeanTPM")
+es_means_long <- select(es_means_long, -Category)
+ips_means_long <- pivot_longer(ips_means, !Category, names_to = "Gene", values_to = "IPS_MeanTPM")
+ips_means_long <- select(ips_means_long, -Category)
+
+es_ips_mean_long <- full_join(es_means_long, ips_means_long)
+
+write.csv(es_ips_mean_long, "ES_IPS_Means.csv")
+```
+
+Mean TPM values are adjusted by adding 1 to each value, in order to overcome issue of TPM values of zero leading to Log2FoldChange values of Inf.   
+Mean TPM values are converted to Log2 values.  
+Log2FoldChange values are calculated for each transcript.  
+Resulting dataframe is ordered by descending Log2FoldChange. Top genes are those that are most upregulated in iPSCs as compared to ESCs. 
+
+```{r}
+#ADJUST BY ADDING 1
+#Calculate Log2FoldChange values: Fib vs ES
+
+#Add 1 to all values
+es_ips_mean_adj <- select(es_ips_mean_long, -Gene) + 1
+es_ips_mean_adj$Gene <- es_ips_mean_long$Gene
+
+#Calculate Log2 values 
+es_ips_mean_long$ES_Log2 <- log2(es_ips_mean_long$ES_MeanTPM)
+es_ips_mean_long$IPS_Log2 <- log2(es_ips_mean_long$IPS_MeanTPM)
+es_ips_mean_long$Log2FoldChange <- es_ips_mean_long$IPS_Log2 - es_ips_mean_long$ES_Log2
+
+#Calculate Log2 Fold Change values
+es_ips_mean_long$ABSV_Log2 <- abs(es_ips_mean_long$Log2FoldChange)
+
+#Take absolute value of Log2FoldChange, arrange by this value
+es_ips_mean_long <- arrange(es_ips_mean_long, desc(ABSV_Log2))
+
+es_ips_mean_adj <- arrange(es_ips_mean_adj, desc(ABSV_Log2))
+es_ips_mean_adj <- es_ips_mean_adj[, c(3, 1, 2, 4, 5, 6, 7)]
+
+write.csv(es_ips_mean_adj, "ES_IPS_Mean_TPM_Adjusted.csv")
+```
+
+##Get top 100 differentially expressed transcripts.  
+Original data is subset to only include transcripts that are most upregulated in iPSCs compared to fibroblasts, or iPSCs compared to ESCs. Resulting data is used for training classifier on most informative transcripts.  
+
+```{r}
+#Get top 100 genes Fibroblast vs. IPS
+
+fib_ips_top100 <- fib_ips_mean_adj$Gene[0:100]
+fib_ips_top100 <- append(fib_ips_top100, "X")
+es_ips_top100 <- es_ips_mean_adj$Gene[0:100]
+es_ips_top100 <- append(es_ips_top100, "X")
+
+#Subset original data to top 100
+fib_cols <- which(colnames(fib_ips_bound) %in% fib_ips_top100)
+fib_ips_bound_filter <- select(fib_ips_bound, fib_cols)
+
+
+es_cols <- which(colnames(es_ips_bound) %in% es_ips_top100)
+es_ips_bound_filter <- select(es_ips_bound, es_cols)
+
+write.csv(fib_ips_bound_filter, "FIB_IPS_Top100Genes_v2.csv")
+
+write.csv(es_ips_bound_filter, "ES_IPS_Top100Genes.csv")
+```
+
+
