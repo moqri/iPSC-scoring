@@ -25,7 +25,7 @@ app.layout = html.Div([
         dcc.Dropdown(
             id='sample',
             options=[
-            {'label': 'iPSC (HPSI0114i)', 'value': 'https://www.dropbox.com/s/cqxrszi63mp9lj1/HPSI0114i-bezi_1.GRCh37.75.cdna.kallisto.transcripts.abundance.rnaseq.20150415.tsv.gz?dl=1'},
+            {'label': 'iPSC (HPSI0114i)', 'value': 'https://www.dropbox.com/s/04m3bux63jo02zt/HPSI0114i-bezi_1.GRCh37.75.cdna.kallisto.transcripts.abundance.rnaseq.20150415.tsv?dl=1'},
             {'label': 'iPSC-CM (GSM3576803)', 'value': 'https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3576nnn/GSM3576803/suppl/GSM3576803_00d5b244-97b4-42eb-9a21-370776533f09.tpm.tsv.gz'},
             {'label': 'Fibroblast (GSM2772599)', 'value':'https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2772nnn/GSM2772599/suppl/GSM2772599_hFb_MRC5_rep1.genes.results.txt.gz'},
             ],
@@ -99,4 +99,4 @@ def update_figure(sample):
 #def load_output(n):time.sleep(1) return ""
 
 if __name__ == '__main__':
-    app.run_server(debug=True)~ $ 
+    app.run_server(debug=True)
