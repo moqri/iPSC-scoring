@@ -5,10 +5,13 @@ import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 import pandas as pd
+import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output
-import model.
+import sys,os
+sys.path.append(os.getcwd() + '/model')
+import web_methods
 
 layout = go.Layout({"title": "Top expressed genes in iPSC",
                        "yaxis": {"title":"Expression (TPM)"},
@@ -94,8 +97,11 @@ def update_figure(sample):
                 x=top.columns
             ))
     fig.update_yaxes(type="log")
-    print(df.loc[topi.index][tpm].values)
-    return fig, '', "Prediction: "+ str(df.loc[topi.index][tpm].values[0]), "Score: "+ str(df.loc[topi.index][tpm].values[1])
+    expr_list=[1]+df.loc[topi.index][tpm].values.tolist()
+    print(expr_list)
+    test_prob = web_methods.get_probability(expr_list, 'data/logistic_v1.joblib')
+    print(test_prob)
+    return fig, '', "Prediction: "+ str(np.round(test_prob)), "Score: "+ str(test_prob)
 
 #@app.callback(Output('display-value', 'children'),[Input('sample', 'value')])
 #def display_value(value):return 'Sample data: {}'.format(value)
