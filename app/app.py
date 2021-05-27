@@ -8,6 +8,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output
+import model.
 
 layout = go.Layout({"title": "Top expressed genes in iPSC",
                        "yaxis": {"title":"Expression (TPM)"},
@@ -41,6 +42,9 @@ app.layout = html.Div([
             [
         dbc.Spinner(html.Div(id="loading-output")),
     ]),
+    html.Br(),
+    html.Div(id='model_c', style={'textAlign': 'center'}),
+    html.Div(id='model_p', style={'textAlign': 'center'})
 ])
 top=pd.read_csv('data/top20.csv',index_col=0)
 topi=pd.read_csv('data/ens.csv',index_col=0,header=None)
@@ -69,8 +73,9 @@ def get_data(sample):
 @app.callback(
     Output('box', 'figure'),
     Output("loading-output", "children"),
+    Output('model_c', 'children'),    
+    Output('model_p', 'children'),    
     Input('sample', 'value'))
-
 def update_figure(sample):
     fig = go.Figure(layout=layout)
     for i in range(20):
@@ -89,12 +94,11 @@ def update_figure(sample):
                 x=top.columns
             ))
     fig.update_yaxes(type="log")
-    return fig,''
+    print(df.loc[topi.index][tpm].values)
+    return fig, '', "Prediction: "+ str(df.loc[topi.index][tpm].values[0]), "Score: "+ str(df.loc[topi.index][tpm].values[1])
 
 #@app.callback(Output('display-value', 'children'),[Input('sample', 'value')])
 #def display_value(value):return 'Sample data: {}'.format(value)
-
-
 #@app.callback(Output("loading-output", "children"), [Input("sample", "value")])
 #def load_output(n):time.sleep(1) return ""
 
