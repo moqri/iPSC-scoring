@@ -81,6 +81,7 @@ def get_data(sample):
     Input('sample', 'value'))
 def update_figure(sample):
     fig = go.Figure(layout=layout)
+    test_prob=0
     for i in range(20):
         fig.add_trace(
             go.Box(
@@ -96,11 +97,11 @@ def update_figure(sample):
                 y=df.loc[topi.index][tpm],
                 x=top.columns
             ))
-    fig.update_yaxes(type="log")
-    expr_list=[1]+df.loc[topi.index][tpm].values.tolist()
-    print(expr_list)
-    test_prob = web_methods.get_probability(expr_list, 'data/logistic_v1.joblib')
-    print(test_prob)
+        fig.update_yaxes(type="log")
+        expr_list=[1]+df.loc[topi.index][tpm].values.tolist()
+        print(expr_list)
+        test_prob = web_methods.get_probability(expr_list, 'data/logistic_v1.joblib')
+        print(test_prob)
     return fig, '', "Prediction: "+ str(np.round(test_prob)), "Score: "+ str(test_prob)
 
 #@app.callback(Output('display-value', 'children'),[Input('sample', 'value')])
