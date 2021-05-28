@@ -11,7 +11,7 @@ class TestClass(unittest.TestCase):
         logistic.execute_all()
 
     def test_web_probability(self):
-        test_set = pd.read_csv('../data/test_set_v1.csv')
+        test_set = pd.read_csv('../data/test_set_v1.csv', index_col=0)
         expr_list = test_set.iloc[0, :-1].tolist()
         test_prob = web_methods.get_probability(expr_list, '../data/logistic_v1.joblib')
         print(test_prob)

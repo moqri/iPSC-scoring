@@ -45,7 +45,7 @@ class LogisticModel(Model):
         self.X_test, self.y_test = self._import_data(test_path)
 
     def _import_data(self, file_path: str):
-        data_set = pd.read_csv(file_path)
+        data_set = pd.read_csv(file_path, index_col=0)
         X = data_set.iloc[:, :-1]
         y = data_set.iloc[:, -1]
         return X, y
