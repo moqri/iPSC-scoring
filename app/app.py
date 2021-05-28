@@ -29,7 +29,7 @@ app.layout = html.Div([
         dcc.Dropdown(
             id='sample',
             options=[
-            {'label': 'iPSC (HPSI0114i)', 'value': 'https://www.dropbox.com/s/04m3bux63jo02zt/HPSI0114i-bezi_1.GRCh37.75.cdna.kallisto.transcripts.abundance.rnaseq.20150415.tsv?dl=1'},
+            {'label': 'iPSC (GSM3576810)', 'value': 'https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3576nnn/GSM3576810/suppl/GSM3576810_1342ed09-a675-4e07-b342-757895f4fa3d.tpm.tsv.gz'},
             {'label': 'iPSC-CM (GSM3576803)', 'value': 'https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM3576nnn/GSM3576803/suppl/GSM3576803_00d5b244-97b4-42eb-9a21-370776533f09.tpm.tsv.gz'},
             {'label': 'Fibroblast (GSM2772599)', 'value':'https://ftp.ncbi.nlm.nih.gov/geo/samples/GSM2772nnn/GSM2772599/suppl/GSM2772599_hFb_MRC5_rep1.genes.results.txt.gz'},
             ],
@@ -49,8 +49,8 @@ app.layout = html.Div([
     html.Div(id='model_c', style={'textAlign': 'center'}),
     html.Div(id='model_p', style={'textAlign': 'center'})
 ])
-top=pd.read_csv('data/top20.csv',index_col=0)
-topi=pd.read_csv('data/ens.csv',index_col=0,header=None)
+top=pd.read_csv('data/top20tf.csv',index_col=0)
+topi=pd.read_csv('data/top20tf_ens.csv',index_col=0)['Gene stable ID'].values
 
 def get_df(url):
     df=pd.read_csv(url,sep='\t',index_col=0)
@@ -91,14 +91,14 @@ def update_figure(sample):
     print(sample)
     if sample!='':
         tpm, df=get_df(sample)
-        print(topi.index)
+        print(topi)
         fig.add_trace(
             go.Line(
-                y=df.loc[topi.index][tpm],
+                y=df.loc[topi][tpm],
                 x=top.columns
             ))
         fig.update_yaxes(type="log")
-        expr_list=[1]+df.loc[topi.index][tpm].values.tolist()
+        expr_list=[1]+df.loc[topi][tpm].values.tolist()
         print(expr_list)
         test_prob = web_methods.get_probability(expr_list, 'data/logistic_v1.joblib')
         print(test_prob)
