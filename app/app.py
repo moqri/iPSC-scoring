@@ -98,7 +98,7 @@ def update_figure(sample):
                 x=top.columns
             ))
         fig.update_yaxes(type="log")
-        expr_list=[1]+df.loc[topi][tpm].values.tolist()
+        expr_list=df.loc[topi][tpm].values.tolist()
         print(expr_list)
         test_prob = web_methods.get_probability(expr_list, 'data/logistic_v1.joblib')
         print(test_prob)
