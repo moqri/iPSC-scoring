@@ -7,7 +7,7 @@ import web_methods
 class TestClass(unittest.TestCase):
 
     def test_logistic_classifier(self):
-        logistic = model.LogisticModel('../data', 'train_set_v1.csv', 'test_set_v1.csv')
+        logistic = model.LogisticModel('../data', 'train_set_v2.csv', 'test_set_v2.csv')
         logistic.execute_all()
 
     def test_web_probability(self):
