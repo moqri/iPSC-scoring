@@ -14,7 +14,7 @@ class Model(ABC):
 
     '''
 
-    def __init__(self, data_dir: str, train_file: str, test_file: str):
+    def __init__(self, data_dir: str, train_file: str, test_file: str, feature_count=20):
         pass
 
     @abstractmethod
@@ -36,17 +36,19 @@ class Model(ABC):
 
 class LogisticModel(Model):
 
-    def __init__(self, data_dir: str, train_file: str, test_file: str):
+    def __init__(self, data_dir: str, train_file: str, test_file: str, feature_count=20):
         super().__init__(data_dir, train_file, test_file)
+        self.feature_count = feature_count
         self.data_dir = data_dir
         train_path = data_dir + '/' + train_file
         test_path = data_dir + '/' + test_file
         self.X_train, self.y_train, = self._import_data(train_path)
         self.X_test, self.y_test = self._import_data(test_path)
+        self.y_pred = None
 
     def _import_data(self, file_path: str):
         data_set = pd.read_csv(file_path, index_col=0)
-        X = data_set.iloc[:, :-1]
+        X = data_set.iloc[:, :self.feature_count]
         y = data_set.iloc[:, -1]
         return X, y
 
@@ -75,10 +77,10 @@ class LogisticModel(Model):
 
     def execute_all(self):
         self.clf = self.train(self.X_train, self.y_train)
-        y_pred = self.predict(self.clf, self.X_test)
-        accuracy = self.calc_accuracy(self.y_test, y_pred)
+        self.y_pred = self.predict(self.clf, self.X_test)
+        accuracy = self.calc_accuracy(self.y_test, self.y_pred)
         print("Model accuracy is: " + str(accuracy))
-        self.save_model('logistic_v2')
+        self.save_model('logistic_v3')
 
 
 
