@@ -10,6 +10,10 @@ class TestClass(unittest.TestCase):
         logistic = model.LogisticModel('../data', 'train_set_v3.csv', 'test_set_v3.csv')
         logistic.execute_all()
 
+    def test_svm_classifier(self):
+        svmm = model.SVMModel('../data', 'train_set_v3.csv', 'test_set_v3.csv')
+        svmm.execute_all()
+
     def test_web_probability(self):
         test_set = pd.read_csv('../data/test_set_v2.csv', index_col=0)
         expr_list = test_set.iloc[0, :-1].tolist()

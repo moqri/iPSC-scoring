@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
+from sklearn import svm
 from joblib import dump, load
 
 
@@ -34,7 +35,7 @@ class Model(ABC):
         pass
 
 
-class LogisticModel(Model):
+class ClassifierModel(Model):
 
     def __init__(self, data_dir: str, train_file: str, test_file: str, feature_count=20):
         super().__init__(data_dir, train_file, test_file)
@@ -52,17 +53,13 @@ class LogisticModel(Model):
         y = data_set.iloc[:, -1]
         return X, y
 
+    @abstractmethod
     def train(self, X_train, y_train):
-        clf = LogisticRegression(random_state=0).fit(X_train, y_train)
-        return clf
+        pass
 
     def predict(self, model, X_test):
         y_pred = model.predict(X_test)
         return y_pred
-
-    def prediction_probs(self, model, X_test):
-        y_probs = model.predict_proba(X_test)
-        return y_probs
 
     def rank_importance(self):
         pass
@@ -80,8 +77,25 @@ class LogisticModel(Model):
         self.y_pred = self.predict(self.clf, self.X_test)
         accuracy = self.calc_accuracy(self.y_test, self.y_pred)
         print("Model accuracy is: " + str(accuracy))
-        self.save_model('logistic_v3')
+        # self.save_model('logistic_v3')
 
+class LogisticModel(ClassifierModel):
+
+    def train(self, X_train, y_train):
+        clf = LogisticRegression(random_state=0).fit(X_train, y_train)
+        return clf
+
+    def prediction_probs(self, model, X_test):
+        y_probs = model.predict_proba(X_test)
+        return y_probs
+
+
+class SVMModel(ClassifierModel):
+
+    def train(self, X_train, y_train):
+        clf = svm.SVC()
+        clf.fit(X_train, y_train)
+        return clf
 
 
 
