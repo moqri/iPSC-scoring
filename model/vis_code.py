@@ -5,19 +5,24 @@ from joblib import dump
 import model
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.ticker import MaxNLocator
 
 from scipy import stats
 
 def plot_1_2_roc():
     lr1 = model.LogisticModel('../data', 'train_set_v2.csv', 'test_set_v2.csv', feature_count=1)
     lr1.execute_all()
-    lr1_disp = metrics.plot_roc_curve(lr1.clf, lr1.X_test, lr1.y_test, name="LinearRegression, 1 genes")
+    lr1_disp = metrics.plot_roc_curve(lr1.clf, lr1.X_test, lr1.y_test, name="LinearRegression, 1 transcript")
 
     lr2 = model.LogisticModel('../data', 'train_set_v2.csv', 'test_set_v2.csv', feature_count=2)
     lr2.execute_all()
-    metrics.plot_roc_curve(lr2.clf, lr2.X_test, lr2.y_test, ax=lr1_disp.ax_, name="LinearRegression, 2 genes")
+    metrics.plot_roc_curve(lr2.clf, lr2.X_test, lr2.y_test, ax=lr1_disp.ax_, name="LinearRegression, 2 transcripts")
 
-    plt.title('ROC with 1 and 2 genes and features')
+    lr3 = model.LogisticModel('../data', 'train_set_v2.csv', 'test_set_v2.csv', feature_count=3)
+    lr3.execute_all()
+    metrics.plot_roc_curve(lr3.clf, lr3.X_test, lr3.y_test, ax=lr1_disp.ax_, name="LinearRegression, 3 transcripts")
+
+    plt.title('ROC curves for 1 and 2 transcripts (features)')
     plt.savefig('../figures/roc_one_two.png')
 
 def corr_1_20():
@@ -53,20 +58,23 @@ def pluritest_spearman(feature_size_list):
 
         spear_vals += [spearman[0]]
 
-    '''
-    plt.plot(feature_size_list, spear_vals)
-    plt.xlabel('number of gene features in model')
+    fig, ax = plt.subplots()
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    plt.plot(feature_size_list, spear_vals, marker='d')
+    plt.xlabel('number of transcript features in model')
     plt.ylabel('Spearman correlation coefficient with PluriTest')
-    plt.title('Spearman correlation with PluriTest vs Feature count')
+    plt.title('Spearman correlation with PluriTest with increasing feature count')
     plt.savefig('../figures/spearman_corr_line_pluritest.png')
-    '''
 
+
+    '''
     # lr has m=20 features now
     plt.xlabel('PluriTest score')
     plt.ylabel('log-normalized StemDB score')
     plt.title("Model probabilities correlation with PluriTest")
     plt.scatter(pt_score_list, -1*np.log10([1-a for a in our_score_list]))
     plt.savefig('../figures/pluritest_correlation.png')
+    '''
 
 def feature_importance():
     lr = model.LogisticModel('../data', 'train_set_v3.csv', 'test_set_v3.csv')
@@ -123,7 +131,6 @@ def feature_importance():
 
 
 if __name__ == '__main__':
-    #plot_1_2_roc()
-    #corr_1_20()
-    #pluritest_spearman(list(range(1,21)))
+    plot_1_2_roc()
+    pluritest_spearman(list(range(1,21)))
     feature_importance()
